@@ -15,6 +15,35 @@ This library differs from other module libaries because it places your module on
 2. Load 3rd party libaries
 3. Define your modules using the define function
 
+## Examples
 
+### Define a module
+```javascript
+define('domain/person', [], function() {
+  var Person = { name: 'John Doe' };
+  return {
+    createPerson: function() { return Object.create(Person); }
+  };
+});
+```
 
+### Define a module with dependencies
+This example uses the person module plus jQuery.
+```javascript
+define('view/person', ['domain/person', 'jQuery'], function(Person, $) {
+  var person = Person.createPerson();
+  return {
+    showPerson: function() {
+      $('#person-div').html(person.name);
+    }
+  };
+});
+```    
+
+### Access a module in html
+Since modules are defined on the global object, you can access them in html.
+```html
+<a onclick="view.person.showPerson(); return false;">Show person</a>
+<div id="person-div"></div>
+```
 
