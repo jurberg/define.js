@@ -11,9 +11,11 @@ This library differs from other module libaries because it places your module on
 
 ## Usage
 
-1. Load the define.js
-2. Load 3rd party libaries
-3. Define your modules using the define function
+1. Load define.js
+2. Load 3rd party libaries.
+3. Define your modules using the define function.  
+4. Manaully load the modules in the correct order.
+5. Enjoy
 
 ## Examples
 
