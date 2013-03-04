@@ -1,4 +1,7 @@
 /*
+
+https://github.com/gruntjs/grunt-contrib-jshint
+
 Copyright (c) 2013 John Urberg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -7,18 +10,19 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-(function() {
+(function(global) {
+    'use strict';
 
     function getModule(name, parent) {
-        var base = this;
+        var base = global;
         var parts = name.split('/');
-        var length = parts.length - (parent ? 1 : 0)
+        var length = parts.length - (parent ? 1 : 0);
         for (var i = 0; i < length; i++) {
             if (parts[i].length > 0) {
                 if (!base[parts[i]]) {
                     base[parts[i]] = {};
                 }
-                base = base[parts[i]]
+                base = base[parts[i]];
             }
         }
         return base;
@@ -52,18 +56,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
      * @param deps - required array of modules this module depends on
      * @param callback - function that defines the module
      */
-    this.define = function(name, deps, callback) {
-        var base = getModule(name, true)
-        base[getLeaf(name)] = callback.apply(this, collectDependencies(deps));
-    }
+    global.define = function(name, deps, callback) {
+        var base = getModule(name, true);
+        base[getLeaf(name)] = callback.apply(global, collectDependencies(deps));
+    };
 
     /**
      * Execute code with dependencies.
      * @param deps - required array of modules this module depends on
      * @param callback - function to execute
      */ 
-    this.require = function(deps, callback) {
-        callback.apply(this, collectDependencies(deps));
-    }
+    global.require = function(deps, callback) {
+        callback.apply(global, collectDependencies(deps));
+    };
 
-}).call(this);
+}(this));
+

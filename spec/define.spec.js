@@ -1,7 +1,29 @@
 describe("define.js", function() {
 
   define('test/one', [], function() {
-    return { id: 123 }
+    return { id: 123 };
+  });
+
+  define('domain/person', [], function() {
+
+    var Person = {
+      firstName: 'John',
+      lastName: 'Doe',
+      getFullName: function() {
+        return this.firstName + ' ' + this.lastName;
+      }
+    };
+
+    return {
+      createPerson: function() {
+        return Object.create(Person);
+      }
+    };
+
+  });
+
+  define('service/person', ['domain/person'], function(Person) {
+    return Person.createPerson();
   });
 
   it("should load a module", function() {

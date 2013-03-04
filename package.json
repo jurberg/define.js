@@ -1,0 +1,23 @@
+{
+  "name": "define.js",
+  "version": "0.1.0",
+  "description": "A simple module loader",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jurberg/define.js.git"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "author": "John Urberg",
+  "license": "MIT",
+  "gitHead": "5781447610635d98407c8e67c78c1e6ef29ccd48",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-uglify": "~0.1.2",
+    "grunt-contrib-jshint": "~0.2.0",
+    "grunt-contrib-jasmine": "~0.3.3"
+  },
+  "dependencies": {}
+}
