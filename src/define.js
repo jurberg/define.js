@@ -9,15 +9,19 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 */
 (function(global) {
     'use strict';
 
+    var modules = {};
+
     function getModule(name, parent) {
-        var base = global;
-        var parts = name.split('/');
-        var length = parts.length - (parent ? 1 : 0);
-        for (var i = 0; i < length; i++) {
+        var base = global,
+            parts = name.split('/'),
+            length = parts.length - (parent ? 1 : 0),
+            i = 0;
+        for (i = 0; i < length; i++) {
             if (parts[i].length > 0) {
                 if (!base[parts[i]]) {
                     base[parts[i]] = {};
@@ -29,8 +33,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     }
 
     function getLeaf(name) {
-        var parts = name.split('/');
-        for (var i = parts.length - 1; i >= 0; i--) {
+        var parts = name.split('/'),
+            i = 0;
+        for (i = parts.length - 1; i >= 0; i--) {
             if (parts[i].length > 0) {
                 return parts[i];
             }
@@ -39,9 +44,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     }
 
     function collectDependencies(deps) {
-        var mods = [];
-        for (var i = 0; i < deps.length; i++) {
-            var mod = getModule(deps[i], false);
+        var mods = [],
+            i = 0,
+            mod = null;
+        for (i = 0; i < deps.length; i++) {
+            mod = getModule(deps[i], false);
             if (!mod) {
                 throw "Dependency '" + deps[i] + "' has not been loaded.";
             }
@@ -57,8 +64,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
      * @param callback - function that defines the module
      */
     global.define = function(name, deps, callback) {
-        var base = getModule(name, true);
-        base[getLeaf(name)] = callback.apply(global, collectDependencies(deps));
+        var base = getModule(name, true),
+            dependencies = collectDependencies(deps);
+        modules[name] = { names: deps, modules: dependencies, callback: callback };    
+        base[getLeaf(name)] = callback.apply(global, dependencies);
     };
 
     /**
@@ -69,6 +78,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     global.require = function(deps, callback) {
         callback.apply(global, collectDependencies(deps));
     };
+
+    /**
+     * Reload a module with optional overrides for dependencies.
+     * @param module name
+     * @param has of module name -> module
+     */
+     global.reload = function(name, overrides) {
+        var base = getModule(name, true),
+            module = modules[name],
+            dependencies = [],
+            i = 0;
+        overrides = overrides || {};    
+        for (i = 0; i < module.names.length; i++) {
+          dependencies.push(overrides[module.names[i]] || module.modules[i]);
+        }
+        base[getLeaf(name)] = module.callback.apply(global, dependencies);
+     };
 
 }(this));
 

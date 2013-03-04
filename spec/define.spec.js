@@ -1,4 +1,5 @@
 describe("define.js", function() {
+  'use strict';
 
   define('test/one', [], function() {
     return { id: 123 };
@@ -58,6 +59,21 @@ describe("define.js", function() {
     });
     require(['service/person'], function(PersonService) {
       expect(PersonService.getFullName()).toBe('Jane Doe');
+    });
+  });
+
+  it("should reload with overrides", function() {
+    reload('service/person', {
+      'domain/person': { 
+        createPerson: function() { return { value: 'test' }; } 
+      }
+    });
+    require(['service/person'], function(PersonService) {
+      expect(PersonService.value).toBe('test');
+    });
+    reload('service/person');
+    require(['service/person'], function(PersonService) {
+      expect(PersonService.getFullName()).toBe('John Doe');
     });
   });
 

@@ -17,6 +17,12 @@ This library differs from other module libaries because it places your module on
 4. Manaully load the modules in the correct order.
 5. Enjoy
 
+## Unit testing
+Sometimes you need to mock out a dependency.  The 'reload' method allows you to reload a module with dependencies mocked out; just pass in an override hash with the module name and the mock.
+
+## Development
+Define.js is built using grunt.js.  Run 'npm install', then use grunt commands.
+
 ## Examples
 
 ### Define a module
@@ -49,3 +55,16 @@ Since modules are defined on the global object, you can access them in html.
 <div id="person-div"></div>
 ```
 
+### Test with a mock
+```javascript
+reload('service/person', { 'domain/person': {
+  createPerson: function() {
+    return { value: 'my mock data' };
+  }
+});
+require(['service/person'], function(PersonService) {
+  // do something with PersonService
+});
+// call reload with no overrides to reload with no mocks
+reload('service/person');
+```      
