@@ -18,7 +18,7 @@ This library differs from other module libaries because it places your module on
 5. Enjoy
 
 ## Unit testing
-Sometimes you need to mock out a dependency.  The 'redefine' method allows you to reload a module with dependencies mocked out; just pass in an override hash with the module name and the mocked methods. It also takes an callback that llows you to mock out methods on the module itself.  Call 'redefine' with only the name to restore the original.
+Sometimes you need to mock out a dependency.  The 'redefine' method allows you to reload a module with dependencies mocked out; just pass in an override hash with the module name and the mocked methods. It also takes a callback that allows you to mock out methods on the module itself.  Call 'redefine' with only the name to restore the original.
 
 ## Development
 Define.js is built using grunt.js.  Run 'npm install', then use grunt commands.
