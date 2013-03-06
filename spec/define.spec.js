@@ -27,6 +27,25 @@ describe("define.js", function() {
     return Person.createPerson();
   });
 
+  define('module1', [], function() {
+    return {
+      op1: function() {
+        return 'module1.op1';
+      },
+      op2: function() {
+        return 'called ' + this.op1();
+      }
+    };
+  });
+
+  define('module2', ['module1'], function(Mod1) {
+    return {
+      op: function() {
+        return Mod1.op2();
+      }
+    };
+  });
+
   it("should load a module", function() {
     require(['test/one'], function(test) {
       expect(test.id).toBe(123);
@@ -62,8 +81,8 @@ describe("define.js", function() {
     });
   });
 
-  it("should reload with overrides", function() {
-    reload('service/person', {
+  it("should redefine with overrides", function() {
+    redefine('service/person', {
       'domain/person': { 
         createPerson: function() { return { value: 'test' }; } 
       }
@@ -71,10 +90,28 @@ describe("define.js", function() {
     require(['service/person'], function(PersonService) {
       expect(PersonService.value).toBe('test');
     });
-    reload('service/person');
+    redefine('service/person');
     require(['service/person'], function(PersonService) {
       expect(PersonService.getFullName()).toBe('John Doe');
     });
+  });
+
+  it("should override methods on the module itself", function() {
+    redefine('module1', {}, function(mod) {
+      return $.extend({}, mod, { op1: function() { return 'overriden'; } });
+    });
+    require(['module1'], function(mod) {
+      expect(mod.op2()).toBe('called overriden');
+    });
+    redefine('module1');
+  });
+
+  it("should partially override modules", function() {
+    redefine('module2',  { 'module1': { op1: function() { return 'test'; } } });
+    require(['module2'], function(mod) {
+      expect(mod.op()).toBe('called test');
+    });
+    redefine('module2');
   });
 
 });

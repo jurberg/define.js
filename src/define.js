@@ -16,6 +16,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     var modules = {};
 
+    function extend(obj) {
+      var args = Array.prototype.slice.call(arguments, 1),
+          source = null,
+          prop = null,
+          i = 0;
+      for (i = 0; i < args.length; i++) {
+        source = args[i];
+        if (source) {
+          for (prop in source) {
+            obj[prop] = source[prop];
+          }
+        }
+      }
+      return obj;
+    }
+
     function getModule(name, parent) {
         var base = global,
             parts = name.split('/'),
@@ -80,20 +96,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     };
 
     /**
-     * Reload a module with optional overrides for dependencies.
+     * Reload a module with optional overrides for dependencies and
+     * override of module results.
      * @param module name
-     * @param has of module name -> module
+     * @param optional dependent module overrides { module name -> override for module }
+     * @param optional callback to proces the result
      */
-     global.reload = function(name, overrides) {
+     global.redefine = function(name, overrides, callback) {
         var base = getModule(name, true),
             module = modules[name],
             dependencies = [],
             i = 0;
         overrides = overrides || {};    
+        callback = callback || function(it) { return it; };
         for (i = 0; i < module.names.length; i++) {
-          dependencies.push(overrides[module.names[i]] || module.modules[i]);
+          dependencies.push(extend({}, module.modules[i], overrides[module.names[i]]));
         }
-        base[getLeaf(name)] = module.callback.apply(global, dependencies);
+        base[getLeaf(name)] = callback(module.callback.apply(global, dependencies));
      };
 
 }(this));
