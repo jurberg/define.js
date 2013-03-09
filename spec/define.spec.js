@@ -106,13 +106,5 @@ describe("define.js", function() {
     redefine('module1');
   });
 
-  it("should partially override modules", function() {
-    redefine('module2',  { 'module1': { op1: function() { return 'test'; } } });
-    require(['module2'], function(mod) {
-      expect(mod.op()).toBe('called test');
-    });
-    redefine('module2');
-  });
-
 });
 

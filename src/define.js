@@ -16,23 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     var modules = {};
 
-    function extend(obj) {
-      var args = Array.prototype.slice.call(arguments, 1),
-          source = null,
-          prop = null,
-          i = 0;
-      for (i = 0; i < args.length; i++) {
-        source = args[i];
-        if (source) {
-          for (prop in source) {
-            obj[prop] = source[prop];
-          }
-        }
-      }
-      return obj;
-    }
-
-    function getModule(name, parent) {
+   function getModule(name, parent) {
         var base = global,
             parts = name.split('/'),
             length = parts.length - (parent ? 1 : 0),
@@ -110,7 +94,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         overrides = overrides || {};    
         callback = callback || function(it) { return it; };
         for (i = 0; i < module.names.length; i++) {
-          dependencies.push(extend({}, module.modules[i], overrides[module.names[i]]));
+          dependencies.push(overrides[module.names[i]] || module.modules[i]);
         }
         base[getLeaf(name)] = callback(module.callback.apply(global, dependencies));
      };
