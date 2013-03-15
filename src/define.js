@@ -14,7 +14,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 (function(global) {
     'use strict';
 
-    var modules = {};
+   var modules = {};
+
+   function isArray(obj) {
+      return Object.prototype.toString.call(obj) === '[object Array]';
+   }
 
    function getModule(name, parent) {
         var base = global,
@@ -64,10 +68,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
      * @param callback - function that defines the module
      */
     global.define = function(name, deps, callback) {
-        var base = getModule(name, true),
-            dependencies = collectDependencies(deps);
-        modules[name] = { names: deps, modules: dependencies, callback: callback };    
-        base[getLeaf(name)] = callback.apply(global, dependencies);
+        var dependencies = [],
+            module = null;
+
+        if (typeof name !== 'string') {
+            callback = deps;
+            deps = name;
+            name = null;
+        }
+
+        if (!isArray(deps)) {
+            callback = deps;
+            deps = [];
+        }
+
+        dependencies = collectDependencies(deps);
+        module = callback.apply(global, dependencies);
+
+        if (name) {
+            modules[name] = { names: deps, modules: dependencies, callback: callback };    
+            getModule(name, true)[getLeaf(name)] = module;
+        }
     };
 
     /**
@@ -87,8 +108,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
      * @param optional callback to proces the result
      */
      global.redefine = function(name, overrides, callback) {
-        var base = getModule(name, true),
-            module = modules[name],
+        var module = modules[name],
             dependencies = [],
             i = 0;
         overrides = overrides || {};    
@@ -96,7 +116,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         for (i = 0; i < module.names.length; i++) {
           dependencies.push(overrides[module.names[i]] || module.modules[i]);
         }
-        base[getLeaf(name)] = callback(module.callback.apply(global, dependencies));
+        getModule(name, true)[getLeaf(name)] = callback(module.callback.apply(global, dependencies));
      };
 
 }(this));

@@ -106,5 +106,23 @@ describe("define.js", function() {
     redefine('module1');
   });
 
+  define('nodeps', function() {
+    return { value: 'nodeps' };
+  });
+
+  it("should handle modules with no dependencies", function() {
+    require(['nodeps'], function(Mod) {
+      expect(Mod.value).toBe('nodeps');
+    });
+  });
+
+  it("should handle anonymous modules", function() {
+    var value = null;
+    define(function() {
+      value = 'testing';
+    });
+    expect(value).toBe('testing');
+  });
+
 });
 
