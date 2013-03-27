@@ -57,7 +57,7 @@ Since modules are defined on the global object, you can access them in html.
 
 ### Test with a mock
 ```javascript
-reload('service/person', { 'domain/person': {
+redefine('service/person', { 'domain/person': {
   createPerson: function() {
     return { value: 'my mock data' };
   }
@@ -66,5 +66,5 @@ require(['service/person'], function(PersonService) {
   // do something with PersonService
 });
 // call reload with no overrides to reload with no mocks
-reload('service/person');
+redefine('service/person');
 ```      
